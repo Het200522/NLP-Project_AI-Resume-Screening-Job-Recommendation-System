@@ -1,0 +1,29 @@
+# Normalize line endings so Docker builds behave the same on Windows and Linux.
+* text=auto eol=lf
+
+# Keep these as LF explicitly - CRLF breaks shell scripts inside containers.
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.py text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+
+# Binary files - never normalize.
+*.docx binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-muted: #64748b;
+}
+
+.dark {
+  --bg: #0b1120;
+  --surface: #111827;
+  --border: #1f2937;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Hide native cursor when AI cursor is active */
+.ai-cursor-active,
+.ai-cursor-active * {
+  cursor: none !important;
+}
+
+/* Restore native cursor on touch devices */
+@media (pointer: coarse) {
+  .ai-cursor-active,
+  .ai-cursor-active * {
+    cursor: auto !important;
+  }
+}
+
+/* Select dropdown dark mode fix */
+.dark select {
+  color-scheme: dark;
+}
+
+.dark select option {
+  background-color: #1f2937;
+  color: #f1f5f9;
+}

@@ -1,0 +1,22 @@
+skill,level,topics,project_idea,resource_hint
+Docker,Beginner to Intermediate,Images|Containers|Dockerfile|Docker Compose|Container networking,Containerize a small REST API and its database with docker-compose,Docker official "Get Started" guide
+Kubernetes,Beginner,Pods|Deployments|Services|ConfigMaps|Helm basics,Deploy a containerized app to a local Minikube cluster,Kubernetes official docs "Learn Kubernetes Basics"
+AWS,Beginner to Intermediate,EC2|S3|IAM|Lambda|RDS,Host a full-stack app on EC2 with an S3-backed static frontend,AWS Cloud Practitioner Essentials (free tier)
+Azure,Beginner to Intermediate,App Service|Azure Functions|Blob Storage|Azure SQL,Deploy a serverless API using Azure Functions,Microsoft Learn Azure Fundamentals
+GCP,Beginner to Intermediate,Compute Engine|Cloud Run|Cloud Storage|BigQuery,Deploy a containerized app on Cloud Run,Google Cloud Skills Boost free labs
+Machine Learning,Beginner to Intermediate,Supervised learning|Model evaluation|Feature engineering|Cross-validation,Build and evaluate a classifier on a public dataset,scikit-learn official tutorials
+Deep Learning,Intermediate,Neural network fundamentals|CNNs|RNNs|Backpropagation,Train an image classifier with a small CNN,fast.ai Practical Deep Learning course
+NLP,Intermediate,Tokenization|Embeddings|Transformers|Text classification,Build a sentiment classifier on product reviews,Hugging Face NLP course
+Computer Vision,Intermediate,Image processing|Object detection|CNN architectures,Build an object detector with a pretrained model,PyImageSearch / OpenCV tutorials
+TensorFlow,Beginner to Intermediate,Tensors|Keras API|Model training|Model saving,Recreate a classic ML model using TensorFlow/Keras,TensorFlow official "Basics" tutorial
+PyTorch,Beginner to Intermediate,Tensors|Autograd|nn.Module|Training loops,Rebuild a small neural net from scratch in PyTorch,PyTorch official 60-minute blitz
+SQL,Beginner,SELECT/JOIN|Aggregations|Subqueries|Indexing,Write analytical queries against a sample e-commerce database,Mode Analytics SQL tutorial
+MongoDB,Beginner,Documents|Collections|Aggregation pipeline|Indexing,Build a small CRUD API backed by MongoDB,MongoDB University free courses
+React,Beginner to Intermediate,Components|Hooks|State management|Routing,Build a small multi-page app with React Router,React official docs (react.dev)
+Next.js,Intermediate,App Router|Server components|API routes|Deployment,Rebuild an existing app using the Next.js App Router,Next.js official "Learn" course
+Git,Beginner,Branching|Merging|Rebasing|Pull requests,Contribute to an open-source repo with a proper PR workflow,GitHub Skills interactive courses
+CI/CD,Intermediate,Pipelines|Automated testing|Deployment automation,Set up a GitHub Actions pipeline that tests and deploys a project,GitHub Actions official docs
+Data Analysis,Beginner,Pandas basics|Data cleaning|Exploratory analysis,Clean and analyze a messy public dataset end to end,Kaggle "Pandas" micro-course
+Power BI,Beginner,Data modeling|DAX basics|Dashboards,Build an interactive sales dashboard,Microsoft Power BI free learning path
+Tableau,Beginner,Connecting data|Calculated fields|Dashboards,Build a public dashboard on Tableau Public,Tableau official training videos
+Generative AI,Intermediate,Prompt engineering|RAG basics|Fine-tuning concepts,Build a small RAG app over a personal document set,Anthropic / OpenAI prompt engineering guides

@@ -1,0 +1,19 @@
+venv
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+uploads
+outputs
+sample_data
+tests
+*.db
+.env
+.env.*
+!.env.example
+Dockerfile
+.dockerignore
+
+# NOTE: do not ignore data/ — app/config.py resolves DATA_DIR there and
+# skill_extractor.py / recommender.py load skills.csv and
+# course_recommendations.csv from it at runtime.

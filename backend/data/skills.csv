@@ -1,0 +1,78 @@
+skill,category,aliases
+Python,Programming,python3|py
+Java,Programming,
+C,Programming,c language
+C++,Programming,cpp|c plus plus
+JavaScript,Programming,js|ecmascript
+TypeScript,Programming,ts
+Go,Programming,golang
+Rust,Programming,
+R,Programming,r language|r programming
+PHP,Programming,
+Ruby,Programming,
+Kotlin,Programming,
+Swift,Programming,
+HTML,Web,html5
+CSS,Web,css3
+React,Web,react.js|reactjs
+Next.js,Web,nextjs|next js
+Node.js,Web,nodejs|node
+Express,Web,express.js|expressjs
+Vue.js,Web,vuejs|vue
+Angular,Web,angularjs
+REST API,Web,rest apis|restful api|restful apis
+GraphQL,Web,
+Django,Web,
+Flask,Web,
+FastAPI,Web,fast api
+MySQL,Database,
+PostgreSQL,Database,postgres
+MongoDB,Database,mongo
+SQL,Database,structured query language
+Redis,Database,
+SQLite,Database,
+Oracle,Database,oracle db
+Machine Learning,AI/ML,ml
+Deep Learning,AI/ML,dl
+NLP,AI/ML,natural language processing
+Computer Vision,AI/ML,cv
+TensorFlow,AI/ML,tf
+PyTorch,AI/ML,torch
+Scikit-learn,AI/ML,sklearn|scikit learn
+Pandas,AI/ML,
+NumPy,AI/ML,numpy
+OpenCV,AI/ML,open cv
+Transformers,AI/ML,huggingface transformers
+LLM,AI/ML,large language models|large language model
+Generative AI,AI/ML,genai|gen ai
+Keras,AI/ML,
+XGBoost,AI/ML,
+AWS,Cloud/DevOps,amazon web services
+Azure,Cloud/DevOps,microsoft azure
+GCP,Cloud/DevOps,google cloud platform|google cloud
+Docker,Cloud/DevOps,
+Kubernetes,Cloud/DevOps,k8s
+Git,Cloud/DevOps,
+GitHub,Cloud/DevOps,
+CI/CD,Cloud/DevOps,continuous integration|continuous deployment
+Jenkins,Cloud/DevOps,
+Terraform,Cloud/DevOps,
+Data Analysis,Data,data analytics
+Power BI,Data,powerbi
+Tableau,Data,
+Excel,Data,ms excel|microsoft excel
+Statistics,Data,statistical analysis
+Data Visualization,Data,
+ETL,Data,
+Big Data,Data,
+Spark,Data,apache spark
+Hadoop,Data,
+Linux,Tools,
+Agile,Tools,agile methodology
+Scrum,Tools,
+Jira,Tools,
+Postman,Tools,
+Communication,Soft Skills,
+Leadership,Soft Skills,
+Teamwork,Soft Skills,team work|collaboration
+Problem Solving,Soft Skills,problem-solving

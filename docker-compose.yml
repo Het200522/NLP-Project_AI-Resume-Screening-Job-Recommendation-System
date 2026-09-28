@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8000"
+    environment:
+      - DATABASE_URL=sqlite:////app/data_db/resume_screener.db
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:8080}
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_outputs:/app/outputs
+      - backend_db:/app/data_db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      # The first startup downloads the sentence-transformer/spaCy models before
+      # the app begins serving, which takes longer than interval * retries.
+      # Without this, Docker marks the container unhealthy during warm-up.
+      start_period: 180s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  backend_uploads:
+  backend_outputs:
+  backend_db:

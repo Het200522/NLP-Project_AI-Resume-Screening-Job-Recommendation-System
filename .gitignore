@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Backend runtime data
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/outputs/*
+!backend/outputs/.gitkeep
+backend/data_db/
+backend/*.db
+backend/.env
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env
+frontend/.env.local
+*.tsbuildinfo
+
+# Root env (docker compose: NEXT_PUBLIC_API_URL / CORS_ORIGINS)
+.env
+!.env.example
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

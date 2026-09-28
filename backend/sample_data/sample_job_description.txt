@@ -1,0 +1,21 @@
+Job Title: Backend Software Engineer
+
+We are looking for a Backend Software Engineer to join our team.
+
+Required:
+- Strong experience with Python and FastAPI
+- Experience with SQL and PostgreSQL
+- Familiarity with Docker and AWS
+- Understanding of REST API design
+- Bachelor's degree in Computer Science or related field
+- 2+ years of experience
+
+Preferred:
+- Experience with Kubernetes
+- Knowledge of Machine Learning
+- Familiarity with Git and CI/CD
+
+Responsibilities:
+- Design and build scalable REST APIs
+- Collaborate with frontend engineers
+- Write clean, tested Python code

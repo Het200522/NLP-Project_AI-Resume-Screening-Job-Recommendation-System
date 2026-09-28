@@ -23,7 +23,7 @@ Manually screening resumes against job requirements is slow, inconsistent, and h
 
 ## Features
 
-- Drag-and-drop resume upload (PDF/DOCX)
+- Drag-and-drop resume upload (PDF/DOCX), with automatic Tesseract OCR fallback for scanned/image-only PDFs
 - Job description paste or upload (TXT/PDF/DOCX)
 - Resume summary generation (extractive, from actual resume content only)
 - Matched / missing / additional skill detection with normalization (e.g. "ML" → "Machine Learning")
@@ -40,6 +40,7 @@ Manually screening resumes against job requirements is slow, inconsistent, and h
 | Concept | Where |
 |---|---|
 | Text preprocessing (clean → tokenize → lowercase → stopwords → lemmatize) | `app/services/preprocess.py` |
+| OCR fallback for scanned PDFs (Tesseract via pytesseract, 300 DPI) | `app/services/resume_parser.py` |
 | Named Entity Recognition (spaCy + regex fallback) | `app/services/ner_service.py` |
 | Skill extraction with alias normalization | `app/services/skill_extractor.py` |
 | TF-IDF + cosine similarity | `app/services/similarity_service.py` |
@@ -244,7 +245,7 @@ pytest tests/ -v
 - **Semantic model availability**: if `sentence-transformers` can't download its model weights at runtime (no internet), semantic scoring falls back to the TF-IDF score. Set `ENABLE_SEMANTIC_MODEL=false` to skip attempting the download entirely.
 - **Section/experience/project extraction** is heuristic (regex + keyword-based), not a full resume-structure parser — it works well on conventionally formatted resumes but may miss heavily custom layouts.
 - **ATS score is an independent estimate**, not a guarantee of how any specific real-world ATS product will score a resume — no legitimate implementation can claim otherwise, since those algorithms are proprietary and undisclosed.
-- **Scanned/image-only PDFs** are not OCR'd; text extraction will fail gracefully with a clear error rather than fabricating content.
+- **Scanned/image-only PDFs** are handled by falling back to Tesseract OCR (`pytesseract` + the `tesseract-ocr` system package, installed in the backend Dockerfile). When a PDF has no embedded text layer, `resume_parser.py` renders each page at 300 DPI and OCRs it. OCR accuracy on low-quality scans is limited, and if a page yields no text the request fails with a clear error rather than fabricating content.
 - **SQLite** is used for simplicity; the SQLAlchemy layer is structured so swapping in PostgreSQL only requires changing `DATABASE_URL`.
 
 ## Future Enhancements

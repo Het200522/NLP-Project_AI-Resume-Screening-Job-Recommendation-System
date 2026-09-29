@@ -38,17 +38,54 @@ SPACY_MODEL = os.getenv("SPACY_MODEL", "en_core_web_sm")
 ENABLE_SEMANTIC_MODEL = os.getenv("ENABLE_SEMANTIC_MODEL", "true").lower() == "true"
 
 # --- Real-world ATS scoring weights (must sum to 1.0) ---
-# Modeled after how real ATS systems (Workday, Taleo, Greenhouse, iCIMS)
-# are publicly known to rank candidates.
+#
+# One unified score. Proprietary ATS algorithms are undisclosed, but their
+# behaviour is publicly documented: they rank on how much of the job's
+# requirements a resume covers, and only treat resume hygiene as a
+# prerequisite for the text being readable at all.
+#
+# Consequence of that model: requirement coverage carries 90% of the weight
+# and parseability carries 10%. The previous split spent 70% of the
+# "ATS readiness" score on hygiene (sections, contact, achievements, verbs,
+# formatting, length) and only 30% on the job, which meant a resume with
+# zero skill overlap but tidy formatting still scored ~70 -- and it made the
+# two score panels disagree with each other on the same resume.
+#
+# Hard minimums the JD states outright (years, degree, named certifications)
+# are NOT scored here. They are evaluated as knockout gates and reported
+# separately, the way an ATS filters before ranking.
 ATS_WEIGHTS = {
-    "keyword_match":     float(os.getenv("ATS_KEYWORD_WEIGHT",     "0.30")),
-    "skill_match":       float(os.getenv("ATS_SKILL_WEIGHT",       "0.25")),
-    "semantic_match":    float(os.getenv("ATS_SEMANTIC_WEIGHT",    "0.15")),
-    "contact_info":      float(os.getenv("ATS_CONTACT_WEIGHT",     "0.10")),
-    "section_structure": float(os.getenv("ATS_SECTION_WEIGHT",     "0.10")),
-    "achievements":      float(os.getenv("ATS_ACHIEVEMENT_WEIGHT", "0.05")),
-    "action_verbs":      float(os.getenv("ATS_VERB_WEIGHT",        "0.05")),
+    "skill_match":      float(os.getenv("ATS_SKILL_WEIGHT",      "0.40")),
+    "keyword_match":    float(os.getenv("ATS_KEYWORD_WEIGHT",    "0.20")),
+    "semantic_match":   float(os.getenv("ATS_SEMANTIC_WEIGHT",   "0.15")),
+    "experience_match": float(os.getenv("ATS_EXPERIENCE_WEIGHT", "0.15")),
+    "parseability":     float(os.getenv("ATS_PARSEABILITY_WEIGHT", "0.10")),
 }
+
+# Sub-weights inside the single parseability category. These are the signals
+# that decide whether an ATS can read the resume at all.
+PARSEABILITY_WEIGHTS = {
+    "contact_info":      float(os.getenv("ATSP_CONTACT_WEIGHT",      "0.30")),
+    "section_structure": float(os.getenv("ATSP_SECTION_WEIGHT",      "0.25")),
+    "formatting":        float(os.getenv("ATSP_FORMATTING_WEIGHT",    "0.25")),
+    "length":            float(os.getenv("ATSP_LENGTH_WEIGHT",        "0.20")),
+}
+
+# Sentence embeddings place two unrelated professional documents at a cosine
+# similarity of roughly 0.35-0.50, so an uncalibrated semantic score hands
+# ~45/100 to a completely mismatched candidate. Everything at or below this
+# floor is rescaled to 0.
+SEMANTIC_FLOOR = float(os.getenv("SEMANTIC_FLOOR", "40"))
+
+# The matching end of the band. Cosine similarity for two genuinely aligned
+# resume/JD pairs rarely exceeds ~0.75 with this model, so treating 100 as
+# reachable would compress every realistic match into the bottom third of the
+# range. The usable band is rescaled from [FLOOR, CEILING] onto 0-100.
+SEMANTIC_CEILING = float(os.getenv("SEMANTIC_CEILING", "75"))
+assert SEMANTIC_CEILING > SEMANTIC_FLOOR, (
+    f"SEMANTIC_CEILING ({SEMANTIC_CEILING}) must exceed "
+    f"SEMANTIC_FLOOR ({SEMANTIC_FLOOR})"
+)
 
 _total = sum(ATS_WEIGHTS.values())
 assert abs(_total - 1.0) < 1e-6, (

@@ -3,7 +3,7 @@ Docker,Beginner to Intermediate,Images|Containers|Dockerfile|Docker Compose|Cont
 Kubernetes,Beginner,Pods|Deployments|Services|ConfigMaps|Helm basics,Deploy a containerized app to a local Minikube cluster,Kubernetes official docs "Learn Kubernetes Basics"
 AWS,Beginner to Intermediate,EC2|S3|IAM|Lambda|RDS,Host a full-stack app on EC2 with an S3-backed static frontend,AWS Cloud Practitioner Essentials (free tier)
 Azure,Beginner to Intermediate,App Service|Azure Functions|Blob Storage|Azure SQL,Deploy a serverless API using Azure Functions,Microsoft Learn Azure Fundamentals
-GCP,Beginner to Intermediate,Compute Engine|Cloud Run|Cloud Storage|BigQuery,Deploy a containerized app on Cloud Run,Google Cloud Skills Boost free labs
+GCP,Beginner to Intermediate,Compute Engine|Cloud Run|Cloud Storage|BigQuery,Deploy a containerized app to Cloud Run,Google Cloud Skills Boost free labs
 Machine Learning,Beginner to Intermediate,Supervised learning|Model evaluation|Feature engineering|Cross-validation,Build and evaluate a classifier on a public dataset,scikit-learn official tutorials
 Deep Learning,Intermediate,Neural network fundamentals|CNNs|RNNs|Backpropagation,Train an image classifier with a small CNN,fast.ai Practical Deep Learning course
 NLP,Intermediate,Tokenization|Embeddings|Transformers|Text classification,Build a sentiment classifier on product reviews,Hugging Face NLP course
@@ -20,3 +20,49 @@ Data Analysis,Beginner,Pandas basics|Data cleaning|Exploratory analysis,Clean an
 Power BI,Beginner,Data modeling|DAX basics|Dashboards,Build an interactive sales dashboard,Microsoft Power BI free learning path
 Tableau,Beginner,Connecting data|Calculated fields|Dashboards,Build a public dashboard on Tableau Public,Tableau official training videos
 Generative AI,Intermediate,Prompt engineering|RAG basics|Fine-tuning concepts,Build a small RAG app over a personal document set,Anthropic / OpenAI prompt engineering guides
+SIEM,Beginner,Log sources|Alert triage|Correlation rules|False-positive tuning,Stand up a lab SIEM (e.g. Wazuh or Elastic) and write detection rules,Elastic Security Labs / Wazuh documentation
+Splunk,Beginner,SPL basics|Indexes|Forwarders|Dashboards,Build a Splunk dashboard over sample authentication logs,Splunk free training (Splunk Skills for Linux)
+Network Security,Beginner,TCP/IP|Subnetting|Firewalls|Network segmentation,Segment a small virtual network and document allowed flows,Professor Messer Network+ / Security+ materials
+Firewall,Beginner,Rule ordering|NAT|VLANs|Stateful inspection,Configure pfSense or iptables rules for a small network,pfSense documentation
+OWASP,Beginner,OWASP Top 10|Injection|XSS|Broken access control|Security headers,Run a scanner against your own app and fix the top five findings,OWASP Testing Guide and ZAP tutorials
+Vulnerability Assessment,Beginner,Scanning|False positives|Risk rating|Remediation,Scan a deliberately vulnerable VM and triage the findings,Nessus Essentials / OWASP ZAP free tier
+Penetration Testing,Beginner,Reconnaissance|Exploitation|Reporting|Scope and rules,Complete a sanctioned CTF machine and write a pentest report,OverTheWire and HackTheBox labs
+Incident Response,Beginner,Preparation|Detection and analysis|Containment|Eradication|Lessons learned,Build an IR playbook and run a tabletop exercise for a data breach,MITRE ATT&CK and NIST SP 800-61
+Digital Forensics,Intermediate,Disk imaging|Memory analysis|Chain of custody|Artifact timelines,Image a suspect drive and recover deleted files,SANS DFIR poster and Magnet Forensics community tools
+Threat Modeling,Beginner,STRIDE|Data flow diagrams|Trust boundaries|Abuse cases,Draw a STRIDE model for an app you have already built,OWASP Threat Modeling Cheat Sheet
+Cryptography,Beginner,Hashing|Symmetric/Asymmetric|Key exchange|TLS handshake,Implement and then break a toy cipher to see the failure modes,CryptoHack and Serious Cryptography resources
+Access Control,Beginner,RBAC|ABAC|Principle of least privilege|Audit logging,Add role-based access control to an existing web app,OWASP Authorization Cheat Sheet
+Identity and Access Management,Intermediate,SSO|OAuth 2.0 and OIDC|SAML|LDAP|Provisioning,Add SSO to a side project using an identity provider,Okta developer docs
+Cloud Security,Beginner,CSPM|IAM hardening|Public exposure|Logging and encryption,Audit a free-tier cloud account and close what is publicly exposed,AWS/Azure/GCP security documentation
+Security Auditing,Beginner,Control frameworks|Evidence collection|Findings and remediation,Audit a small project against a security checklist,CIS Benchmarks (free) and OWASP ASVS
+Secure Code Review,Beginner,Input validation|Authentication flows|Secrets handling|Dependency risk,Review and harden the public source of a small application,OWASP Code Review Guide
+Cloud Migration,Beginner,Assessment|Planning|Wave execution|Cutover and rollback,Move a small app from a VM to managed cloud services,AWS Well-Architected Migration Lens
+Infrastructure as Code,Beginner,HCL|State management|Modules|Drift detection,Provision a complete environment with Terraform,HashiCorp Terraform tutorials
+Serverless,Beginner,Function-as-a-service|Event triggers|Cold starts|Quotas,Deploy an event-driven API using functions only,AWS Lambda developer guide
+Bash,Beginner,Quoting|Pipes|Redirection|Permission and process control,Automate your own dev setup and log rotation in a shell script,The Linux Command Line (free online)
+PowerShell,Beginner,Cmdlets|Objects and pipelines|Scripting|Windows event logs,Write a script that inventories installed software,Microsoft Learn PowerShell docs
+Selenium,Beginner,Locators|Waits|Page objects|Assertions,Automate a login and checkout flow on a sandbox site,Selenium official documentation
+Test Automation,Beginner to Intermediate,Framework design|Test data|CI integration|Flakiness,Build a small regression suite for an open-source project,Playwright and Cypress documentation
+API Testing,Beginner,Status codes|Contracts|Auth flows|Schema validation,Write an automated contract test suite for a public API,Postman and Schemathesis documentation
+Figma,Beginner,Frames and auto-layout|Components|Prototyping|Handoff,Redesign an existing web app as a Figma prototype,Figma official resource hub
+User Research,Beginner,Interview technique|Recruitment|Synthesis|Insight writing,Run five usability interviews and present the findings,Nielsen Norman Group articles
+Prototyping,Beginner,Fidelity levels|Interaction states|Animation basics,Build three prototypes of one flow at different fidelities,Figma official resource hub
+Design Systems,Beginner,Tokens|Component APIs|Documentation|Governance,Create a small design system with tokens and five components,Material Design or Carbon design system docs
+Accessibility,Beginner,WCAG 2.2|PoE testing|Screen readers|Semantic HTML,Run a manual accessibility audit and fix the violations,W3C WAI tutorials and axe DevTools
+Stakeholder Management,Beginner,Stakeholder mapping|Expectation setting|Influence|Reporting,Run a retrospective and present a prioritised roadmap to stakeholders,Atlassian playbook articles
+Product Management,Beginner,Discovery|Positioning|Roadmapping|Metrics,Write a PRD and a launch checklist for a feature on a real product,Product School and Lenny's Newsletter
+Bash Scripting,Beginner,Loops|Functions|Error handling|Argument parsing,Build a log-parsing cron job that emails a daily digest,The Linux Command Line (free online)
+Kubernetes Security,Intermediate,RBAC hardening|Network policies|Image scanning|Runtime security,Lock down a Minikube cluster against the CIS benchmark,CIS Kubernetes Benchmark (free)
+GitHub Actions,Beginner,Workflow syntax|Secrets|Matrix builds|Caching,"Add lint, test and deploy jobs to a real repository",GitHub Actions official docs
+Terraform,Beginner,HCL syntax|Providers|State|Modules|Drift,Provision a full dev environment on a free cloud account,HashiCorp Terraform tutorials
+Ansible,Beginner,Inventory|Playbooks|Roles|Idempotency,Configure a fleet of test VMs from a single playbook,Ansible official documentation
+Machine Learning Operations,Intermediate,Experiment tracking|Model registry|Drift monitoring|Retraining,Stand up an MLflow tracking server and log a real training run,MLflow official quickstart
+Data Warehousing,Beginner,Star schema|Fact and dimension tables|Partitioning|Cost,Model a small business's data in a dimensional schema,dbt Labs and Google BigQuery docs
+Statistics,Beginner to Intermediate,Distributions|Hypothesis testing|Confidence intervals|Regression basics,Run an A/B test analysis on a public dataset,Khan Academy Statistics and StatQuest
+Hypothesis Testing,Beginner,p-values|Power|A/B design|Multiple comparisons,Design and interpret an A/B test for a real product,Google Analytics experimentation guides
+Communication,Beginner,Concise writing|Signposting|Stakeholder updates,Rewrite a dense project update into a one-page summary,Barbara Minto's Pyramid Principle
+Problem Solving,Beginner,Problem framing|Root cause analysis|Prioritization,Write a postmortem for a real open-source incident,Google SRE Workbook (free)
+Presentation Skills,Beginner,Narrative structure|Slide design|Delivering with data,Turn a technical project into a five-slide talk,Toastmasters and Nancy Duarte resources
+Agile,Tools,Iteration planning|Standups|Retrospectives|Definition of done,Run two-week sprints for a real student project team,Atlassian Agile tutorials
+Leadership,Intermediate,Delegation|Coaching|Feedback|Conflict resolution,Take responsibility for a sprint's delivery and mentor a teammate,Atlassian and GitLab leadership guides
+Teamwork,Soft Skills,Cross-functional collaboration|Async communication|Conflict resolution,Coordinate a multi-person project with no shared timezone,GitLab remote work handbook (free)

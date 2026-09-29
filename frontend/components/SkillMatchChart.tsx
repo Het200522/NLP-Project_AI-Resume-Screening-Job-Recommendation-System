@@ -10,7 +10,46 @@ interface SkillMatchChartProps {
   totalJdSkills: number;
 }
 
-export default function SkillMatchChart({ matched, missing, totalJdSkills }: SkillMatchChartProps) {
+function Chips({
+  items,
+  tone,
+  empty,
+  icon: Icon,
+}: {
+  items: string[];
+  tone: "matched" | "missing";
+  empty: string;
+  icon: typeof Check;
+}) {
+  const styles = {
+    matched: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+    missing: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+  } as const;
+
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {items.length === 0 && (
+        <span className="text-xs text-[var(--text-muted)]">{empty}</span>
+      )}
+      {items.map((s) => (
+        <span
+          key={s}
+          className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full ${styles[tone]}`}
+        >
+          <Icon size={11} /> {s}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+export default function SkillMatchChart({
+  matched,
+  missing,
+  totalJdSkills,
+}: SkillMatchChartProps) {
+  const coverage = totalJdSkills > 0 ? (matched.length / totalJdSkills) * 100 : 0;
+
   const data = [
     { name: "Matched", value: matched.length, color: "#10b981" },
     { name: "Missing", value: missing.length, color: "#ef4444" },
@@ -48,26 +87,25 @@ export default function SkillMatchChart({ matched, missing, totalJdSkills }: Ski
 
       <div className="space-y-4">
         <div>
-          <p className="text-xs font-medium text-[var(--text-muted)] mb-2">Matched Skills</p>
-          <div className="flex flex-wrap gap-1.5">
-            {matched.length === 0 && <span className="text-xs text-[var(--text-muted)]">None detected</span>}
-            {matched.map((s) => (
-              <span key={s} className="flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 px-2.5 py-1 rounded-full">
-                <Check size={11} /> {s}
-              </span>
-            ))}
+          <div className="flex justify-between text-sm mb-2">
+            <span className="text-[var(--text-muted)]">ATS skill coverage</span>
+            <span className="font-medium">{coverage.toFixed(0)}%</span>
           </div>
+          <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-700"
+              style={{ width: `${coverage}%`, backgroundColor: "#3466ff" }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-[var(--text-muted)] mb-2">Matched Skills</p>
+          <Chips items={matched} tone="matched" empty="None detected" icon={Check} />
         </div>
         <div>
           <p className="text-xs font-medium text-[var(--text-muted)] mb-2">Missing Skills</p>
-          <div className="flex flex-wrap gap-1.5">
-            {missing.length === 0 && <span className="text-xs text-[var(--text-muted)]">None — great coverage!</span>}
-            {missing.map((s) => (
-              <span key={s} className="flex items-center gap-1 text-xs bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 px-2.5 py-1 rounded-full">
-                <X size={11} /> {s}
-              </span>
-            ))}
-          </div>
+          <Chips items={missing} tone="missing" empty="None — great coverage!" icon={X} />
         </div>
       </div>
     </SpotlightCard>

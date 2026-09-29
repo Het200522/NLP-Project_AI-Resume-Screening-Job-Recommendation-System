@@ -6,7 +6,7 @@ const FEATURES = [
   { icon: ScanSearch, title: "Resume Parsing", desc: "Extracts text, contact info, education, experience, and projects from PDF/DOCX resumes." },
   { icon: BarChart3, title: "Semantic Matching", desc: "Combines TF-IDF and sentence embeddings to score how well a resume fits a job description." },
   { icon: ListChecks, title: "Skill Gap Analysis", desc: "Identifies matched, missing, and additional skills, with tailored learning recommendations." },
-  { icon: Sparkles, title: "ATS Readiness", desc: "A transparent, weighted compatibility score based on real-world resume-parsing best practices." },
+  { icon: Sparkles, title: "One ATS Score", desc: "A single score built on job-description coverage, with hard requirements reported as separate pass/fail gates." },
 ];
 
 const PIPELINE = [

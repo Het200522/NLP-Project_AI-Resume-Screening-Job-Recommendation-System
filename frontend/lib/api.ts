@@ -9,6 +9,16 @@ export const api = axios.create({
   timeout: 60000,
 });
 
+export interface ExperienceInfo {
+  years: number;
+  source: string;
+  detail: string;
+  required: string | null;
+  required_min_years: number | null;
+  required_max_years: number | null;
+  match_score: number | null;
+}
+
 export interface AnalyzeResponse {
   id: number | null;
   candidate: {
@@ -28,13 +38,35 @@ export interface AnalyzeResponse {
     keyword_score: number;
     final_score: number;
     used_semantic_model: boolean;
-    categories: Record<string, number>;
+    categories: Record<string, number | null>;
     weights: Record<string, number>;
+    raw_semantic_score: number | null;
+    experience_score: number | null;
+    parseability_score: number | null;
+    keyword_detail: {
+      keywords?: string[];
+      matched?: string[];
+      missing?: string[];
+      fuzzy_matches?: string[];
+    };
+    parseability_detail: {
+      contact_info?: number;
+      section_structure?: number;
+      formatting?: number;
+      length?: number;
+    };
   };
   matched_skills: string[];
   missing_skills: string[];
   additional_skills: string[];
   total_jd_skills: number;
+  required_skills: string[];
+  preferred_skills: string[];
+  matched_required: string[];
+  missing_required: string[];
+  matched_preferred: string[];
+  missing_preferred: string[];
+  experience: ExperienceInfo;
   summary: string;
   sections: {
     experience: string;
@@ -57,13 +89,23 @@ export interface AnalyzeResponse {
   };
   compatibility: {
     indicators: { label: string; ok: boolean; note: string }[];
-    ats_score: {
-      overall_score: number;
-      band: string;
-      categories: Record<string, { score: number; weight: number; detail: string }>;
-      recommendations: string[];
-      disclaimer: string;
-    };
+  };
+  /**
+   * Hard minimums the job description states, reported separately from the
+   * score. `passed` is false only when the posting states a requirement the
+   * resume does not meet, so a candidate is told exactly what is missing
+   * instead of having the number quietly lowered.
+   */
+  knockouts: {
+    gates: {
+      label: string;
+      requirement: string;
+      requirement_met: boolean;
+      detail: string;
+    }[];
+    failed: string[];
+    passed: boolean;
+    evaluated: boolean;
   };
   status: string;
   created_at: string | null;

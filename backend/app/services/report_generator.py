@@ -59,29 +59,65 @@ def generate_report(analysis: dict) -> str:
     story.append(Paragraph("Match Analysis", h2))
     scores = analysis.get("scores", {})
     cats = scores.get("categories", {})
+    weights = scores.get("weights", {})
     score_rows = [["Overall Score", f"{scores.get('final_score', 0)}%"]]
     for cat_name, cat_score in cats.items():
         label = cat_name.replace("_", " ").title()
-        score_rows.append([label, f"{cat_score}%"])
-    score_table = Table(score_rows, colWidths=[150, 300])
+        if weights.get(cat_name) is not None:
+            label = f"{label} ({weights[cat_name] * 100:.0f}%)"
+        score_rows.append([label, "Not applicable" if cat_score is None else f"{cat_score}%"])
+    score_table = Table(score_rows, colWidths=[220, 230])
     score_table.setStyle(_table_style())
     story.append(score_table)
     story.append(Paragraph(
-        "Note: this score uses a weighted 7-category ATS model "
-        "(keyword match, skills, semantic similarity, contact info, "
-        "section structure, achievements, action verbs).",
+        "Weighted multi-category ATS model. Categories that could not be "
+        "evaluated for this role (for example experience, when the job "
+        "description states no requirement) have their weight redistributed "
+        "across the remaining categories.",
         ParagraphStyle("note", parent=body, fontSize=8, textColor=colors.grey)
     ))
 
-    # Matched skills
-    story.append(Paragraph("Matched Skills", h2))
-    matched = analysis.get("matched_skills", [])
-    story.append(Paragraph(", ".join(matched) if matched else "None detected", body))
+    # Experience fit
+    exp = analysis.get("experience") or {}
+    if exp:
+        story.append(Paragraph("Experience Fit", h2))
+        story.append(Paragraph(
+            f"Estimated experience: {exp.get('years', 0)} year(s). "
+            f"Role requires: {exp.get('required') or 'not specified'}."
+            + (f" Match: {exp.get('match_score')}%" if exp.get("match_score") is not None else ""),
+            body,
+        ))
 
-    # Missing skills
-    story.append(Paragraph("Missing Skills", h2))
-    missing = analysis.get("missing_skills", [])
-    story.append(Paragraph(", ".join(missing) if missing else "None", body))
+    # Hard minimums the posting states, reported separately from the score
+    knockouts = analysis.get("knockouts") or {}
+    if knockouts.get("evaluated"):
+        story.append(Paragraph("Hard Requirements (Knockout Gates)", h2))
+        if knockouts.get("passed"):
+            story.append(Paragraph("All hard requirements stated by the job description are met.", body))
+        else:
+            story.append(Paragraph(
+                "The following stated requirements are not met: "
+                + ", ".join(knockouts.get("failed", [])) + ".", body,
+            ))
+        for gate in knockouts.get("gates", []):
+            mark = "MET" if gate["requirement_met"] else "NOT MET"
+            story.append(Paragraph(
+                f"[{mark}] {gate['label']} — {gate['requirement']}. {gate['detail']}", body,
+            ))
+
+    # Skills: flat ATS keyword match, every JD skill weighted equally
+    total_skills = analysis.get("total_jd_skills") or 0
+    matched_skills = analysis.get("matched_skills") or []
+    missing_skills = analysis.get("missing_skills") or []
+    coverage = (len(matched_skills) / total_skills * 100) if total_skills else 0.0
+
+    story.append(Paragraph(
+        f"Skills Matched ({len(matched_skills)} of {total_skills}, {coverage:.0f}% coverage)", h2
+    ))
+    story.append(Paragraph(", ".join(matched_skills) if matched_skills else "None detected", body))
+
+    story.append(Paragraph("Skills Missing", h2))
+    story.append(Paragraph(", ".join(missing_skills) if missing_skills else "None", body))
 
     # Recommendations
     story.append(Paragraph("Recommendations", h2))
@@ -119,12 +155,6 @@ def generate_report(analysis: dict) -> str:
     for ind in compat.get("indicators", []):
         mark = "PASS" if ind["ok"] else "CHECK"
         story.append(Paragraph(f"[{mark}] {ind['label']}", body))
-
-    ats = compat.get("ats_score")
-    if ats:
-        story.append(Paragraph(f"ATS Readiness Score: {ats['overall_score']} — {ats['band']}", body))
-        for name, cat in ats.get("categories", {}).items():
-            story.append(Paragraph(f"  • {name.replace('_', ' ').title()}: {cat['score']}%", body))
 
     doc.build(story)
     return str(filepath)

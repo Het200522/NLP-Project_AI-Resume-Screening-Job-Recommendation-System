@@ -2,69 +2,89 @@
 
 import SpotlightCard from "@/components/SpotlightCard";
 import type { AnalyzeResponse } from "@/lib/api";
-import { AlertTriangle } from "lucide-react";
+import { CheckCircle2, XCircle, ShieldCheck, ShieldAlert } from "lucide-react";
 
-const CATEGORY_LABELS: Record<string, string> = {
-  keyword_match: "Keyword Match vs. Job Description",
-  section_structure: "Standard Section Structure",
-  contact_completeness: "Contact Completeness",
-  quantifiable_achievements: "Quantifiable Achievements",
-  action_verb_usage: "Action-Verb Usage",
-  formatting_risk: "Formatting Risk",
-  length_structure: "Length & Structure",
-};
-
-function bandColor(score: number): string {
-  if (score >= 85) return "text-emerald-600 dark:text-emerald-400";
-  if (score >= 70) return "text-brand-600 dark:text-brand-300";
-  if (score >= 50) return "text-amber-600 dark:text-amber-400";
-  return "text-red-600 dark:text-red-400";
-}
-
-export default function ATSCompatibility({ compatibility }: { compatibility: AnalyzeResponse["compatibility"] }) {
-  const ats = compatibility.ats_score;
+/**
+ * Hard requirements and parser compatibility.
+ *
+ * This panel deliberately shows no score. The single ATS score lives in
+ * AnalysisScore; duplicating a number here is what previously let two panels
+ * disagree (contact 50% vs 100%, achievements 33% vs 100%). What is shown
+ * instead is the set of minimums the posting states, and whether the resume
+ * clears each one, which is what a real ATS does before it ranks anyone.
+ */
+export default function ATSCompatibility({
+  compatibility,
+  knockouts,
+}: {
+  compatibility: AnalyzeResponse["compatibility"];
+  knockouts: AnalyzeResponse["knockouts"];
+}) {
+  const failedIndicators = compatibility.indicators.filter((i) => !i.ok);
 
   return (
-    <SpotlightCard className="p-6 flex flex-col justify-between">
+    <SpotlightCard className="p-6 flex flex-col">
       <div>
-        <div className="flex items-start justify-between mb-1">
-          <h3 className="font-medium text-sm">ATS Readiness</h3>
-          <span className={`text-2xl font-bold ${bandColor(ats.overall_score)}`}>{ats.overall_score.toFixed(0)}</span>
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className="font-medium text-sm">Hard Requirements</h3>
+          {knockouts.evaluated ? (
+            knockouts.passed ? (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck size={14} /> All met
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400">
+                <ShieldAlert size={14} /> {knockouts.failed.length} not met
+              </span>
+            )
+          ) : null}
         </div>
-        <p className={`text-sm font-medium mb-4 ${bandColor(ats.overall_score)}`}>{ats.band}</p>
+        <p className="text-xs text-[var(--text-muted)] mb-4">
+          {knockouts.evaluated
+            ? "Minimums this job description states. These are pass/fail filters, not part of the score."
+            : "This job description states no hard minimum requirements, so there is nothing to filter on."}
+        </p>
 
-        <div className="space-y-2 mb-4">
-          {Object.entries(ats.categories).map(([key, cat]) => (
-            <div key={key}>
-              <div className="flex justify-between text-xs mb-0.5">
-                <span className="text-[var(--text-muted)]">{CATEGORY_LABELS[key] || key}</span>
-                <span className="font-medium">{cat.score.toFixed(0)}%</span>
+        {knockouts.gates.length > 0 && (
+          <div className="space-y-3 mb-4">
+            {knockouts.gates.map((gate, i) => (
+              <div key={i} className="flex items-start gap-2">
+                {gate.requirement_met ? (
+                  <CheckCircle2
+                    size={15}
+                    className="shrink-0 mt-0.5 text-emerald-600 dark:text-emerald-400"
+                  />
+                ) : (
+                  <XCircle
+                    size={15}
+                    className="shrink-0 mt-0.5 text-red-600 dark:text-red-400"
+                  />
+                )}
+                <div>
+                  <p className="text-xs font-medium">{gate.label}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{gate.detail}</p>
+                </div>
               </div>
-              <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-brand-500 transition-all duration-700"
-                  style={{ width: `${cat.score}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+
+        {failedIndicators.length > 0 && (
+          <div className="border-t border-[var(--border)] pt-3">
+            <h4 className="text-xs font-medium text-amber-700 dark:text-amber-400 mb-1.5">
+              Parser compatibility
+            </h4>
+            <ul className="space-y-1">
+              {failedIndicators.map((ind, i) => (
+                <li key={i} className="text-xs text-[var(--text-muted)]">
+                  {ind.label}
+                  {ind.note ? ` — ${ind.note}` : ""}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
-
-      {ats.recommendations.length > 0 && (
-        <div className="border-t border-[var(--border)] pt-3 space-y-1.5">
-          {ats.recommendations.map((r, i) => (
-            <div key={i} className="flex items-start gap-2 text-xs text-amber-700 dark:text-amber-400">
-              <AlertTriangle size={13} className="shrink-0 mt-0.5" />
-              <span>{r}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <p className="text-[10px] text-[var(--text-muted)] mt-3 border-t border-[var(--border)] pt-2">
-        {ats.disclaimer}
-      </p>
     </SpotlightCard>
   );
 }

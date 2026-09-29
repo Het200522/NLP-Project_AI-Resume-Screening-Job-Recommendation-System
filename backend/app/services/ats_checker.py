@@ -1,23 +1,20 @@
 """
 ats_checker.py
 
-A comprehensive, weighted "Resume Compatibility / ATS Readiness Score"
-built from the same signal categories real-world ATS and resume-parsing
-tools are publicly known to weigh: keyword match, section structure,
-contact completeness, quantifiable achievements, action-verb usage,
-formatting risk, and length.
+Resume parseability signals and quality checks.
 
-This is NOT a reproduction of any proprietary vendor's (Workday, Taleo,
-Greenhouse, iCIMS, etc.) internal algorithm -- those are undisclosed and
-cannot be legitimately replicated. It is a transparent, rule-based model
-built on widely published ATS best practices, and every sub-score is
-explainable and traceable to a concrete signal in the resume text.
+This module owns the resume-only signals that decide whether an ATS can read
+a file: contact completeness, section structure, formatting risk and length,
+plus the boolean quality checklist shown in the report.
+
+The overall ATS score itself lives in app.services.similarity_service, which
+is the single scoring engine. This module deliberately does NOT compute a
+second, competing score: the previous design had one here and one there,
+measured the same signals with different regexes, and the two panels
+disagreed with each other on the same resume (e.g. contact 50% vs 100%,
+achievements 33% vs 100%). One engine, one number.
 """
 import re
-
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-from app.services.preprocess import preprocess_for_matching
 
 ACTION_VERBS = {
     "achieved", "built", "created", "designed", "developed", "engineered",
@@ -27,6 +24,8 @@ ACTION_VERBS = {
     "supervised", "trained", "transformed", "delivered", "automated",
     "architected", "analyzed", "collaborated", "coordinated", "deployed",
     "mentored", "negotiated", "pioneered", "prototyped", "refactored",
+    "configured", "integrated", "secured", "audited", "investigated",
+    "diagnosed", "migrated", "standardized", "accelerated", "generated",
 }
 
 PERSONAL_PRONOUNS = {"i", "me", "my", "mine", "myself"}
@@ -36,92 +35,21 @@ STANDARD_SECTIONS = [
     "certifications", "summary", "objective", "achievements", "publications",
 ]
 
-# Category weights must sum to 1.0
-WEIGHTS = {
-    "keyword_match": 0.30,
-    "section_structure": 0.15,
-    "contact_completeness": 0.10,
-    "quantifiable_achievements": 0.15,
-    "action_verb_usage": 0.10,
-    "formatting_risk": 0.10,
-    "length_structure": 0.10,
-}
-
 
 def _keyword_match_score(resume_text: str, jd_text: str) -> tuple[float, str]:
-    """Fraction of the JD's top TF-IDF keywords that appear in the resume."""
+    """DEPRECATED: keyword scoring is owned by similarity_service now.
+
+    Kept only as a compatibility shim for anything that imports it. The real
+    keyword signal is IDF-weighted and synonym/fuzzy aware; this version was
+    a bare TF-IDF top-25 word split that disagreed with it.
+    """
+    from app.services.similarity_service import keyword_overlap_score
+
     if not jd_text or not jd_text.strip():
         return 0.0, "No job description provided for keyword comparison."
 
-    jd_clean = preprocess_for_matching(jd_text)
-    resume_clean = preprocess_for_matching(resume_text)
-    if not jd_clean.strip():
-        return 0.0, "Job description produced no usable keywords."
-
-    vectorizer = TfidfVectorizer(max_features=25)
-    try:
-        vectorizer.fit([jd_clean])
-    except ValueError:
-        return 0.0, "Could not extract keywords from job description."
-
-    jd_keywords = set(vectorizer.get_feature_names_out())
-    resume_tokens = set(resume_clean.split())
-    overlap = jd_keywords & resume_tokens
-
-    if not jd_keywords:
-        return 0.0, "No job description keywords found."
-
-    score = (len(overlap) / len(jd_keywords)) * 100
-    detail = f"{len(overlap)} of {len(jd_keywords)} top job-description keywords found in resume."
-    return round(score, 1), detail
-
-
-def _section_structure_score(resume_text: str) -> tuple[float, str, list[str]]:
-    found = []
-    lower = resume_text.lower()
-    for section in STANDARD_SECTIONS:
-        pattern = rf"^\s*{re.escape(section)}\s*:?\s*$"
-        if re.search(pattern, lower, re.MULTILINE) or re.search(rf"\b{re.escape(section)}\b", lower):
-            found.append(section)
-
-    unique_core = {s for s in found if s in ("education", "experience", "work experience", "skills", "projects")}
-    score = min(100.0, (len(unique_core) / 4) * 100)
-    detail = f"Detected section headings: {', '.join(sorted(set(found))) or 'none'}."
-    return round(score, 1), detail, found
-
-
-def _contact_completeness_score(entities: dict) -> tuple[float, str]:
-    fields = ["email", "phone", "name", "linkedin", "github"]
-    present = [f for f in fields if entities.get(f)]
-    score = (len(present) / len(fields)) * 100
-    missing = [f for f in fields if not entities.get(f)]
-    detail = f"Missing: {', '.join(missing)}." if missing else "All key contact fields detected."
-    return round(score, 1), detail
-
-
-def _quantifiable_achievements_score(resume_text: str) -> tuple[float, str]:
-    matches = re.findall(r"(\$\s?\d[\d,]*|\d+(\.\d+)?\s?%|\b\d+x\b|\b\d{2,}\+?\b)", resume_text)
-    count = len(matches)
-    score = min(100.0, (count / 5) * 100)
-    detail = f"Found {count} quantified achievement indicator(s) (numbers, %, $, etc.)."
-    return round(score, 1), detail
-
-
-def _action_verb_score(resume_text: str) -> tuple[float, str]:
-    line_starts = []
-    for line in resume_text.splitlines():
-        stripped = line.strip().lstrip("-•●▪◦‣*").strip()
-        if not stripped:
-            continue
-        words = stripped.split()
-        if words:
-            line_starts.append(words[0].lower().strip(".,:;"))
-    verb_starts = sum(1 for w in line_starts if w in ACTION_VERBS)
-    total_lines = max(1, len(line_starts))
-    ratio = verb_starts / total_lines
-    score = min(100.0, ratio * 300)
-    detail = f"{verb_starts} line(s) start with a strong action verb out of {total_lines} content line(s)."
-    return round(score, 1), detail
+    score = keyword_overlap_score(resume_text, jd_text)
+    return score, f"Weighted job-description keyword coverage: {score}%."
 
 
 def _formatting_risk_score(resume_text: str) -> tuple[float, str]:
@@ -164,56 +92,6 @@ def _length_structure_score(resume_text: str) -> tuple[float, str]:
     return round(max(0.0, min(100.0, score)), 1), detail
 
 
-def compute_ats_score(resume_text: str, jd_text: str, entities: dict) -> dict:
-    keyword_score, keyword_detail = _keyword_match_score(resume_text, jd_text)
-    section_score, section_detail, _ = _section_structure_score(resume_text)
-    contact_score, contact_detail = _contact_completeness_score(entities)
-    quant_score, quant_detail = _quantifiable_achievements_score(resume_text)
-    verb_score, verb_detail = _action_verb_score(resume_text)
-    format_score, format_detail = _formatting_risk_score(resume_text)
-    length_score, length_detail = _length_structure_score(resume_text)
-
-    categories = {
-        "keyword_match": {"score": keyword_score, "weight": WEIGHTS["keyword_match"], "detail": keyword_detail},
-        "section_structure": {"score": section_score, "weight": WEIGHTS["section_structure"], "detail": section_detail},
-        "contact_completeness": {"score": contact_score, "weight": WEIGHTS["contact_completeness"], "detail": contact_detail},
-        "quantifiable_achievements": {"score": quant_score, "weight": WEIGHTS["quantifiable_achievements"], "detail": quant_detail},
-        "action_verb_usage": {"score": verb_score, "weight": WEIGHTS["action_verb_usage"], "detail": verb_detail},
-        "formatting_risk": {"score": format_score, "weight": WEIGHTS["formatting_risk"], "detail": format_detail},
-        "length_structure": {"score": length_score, "weight": WEIGHTS["length_structure"], "detail": length_detail},
-    }
-
-    overall = sum(c["score"] * c["weight"] for c in categories.values())
-    overall = round(max(0.0, min(100.0, overall)), 1)
-
-    if overall >= 85:
-        band = "Excellent ATS readiness"
-    elif overall >= 70:
-        band = "Good ATS readiness"
-    elif overall >= 50:
-        band = "Needs improvement"
-    else:
-        band = "High risk of being filtered out"
-
-    recommendations = [
-        f"Improve {name.replace('_', ' ')}: {c['detail']}"
-        for name, c in categories.items() if c["score"] < 60
-    ]
-
-    return {
-        "overall_score": overall,
-        "band": band,
-        "categories": categories,
-        "recommendations": recommendations,
-        "disclaimer": (
-            "This is an independent, rule-based ATS readiness estimate based on "
-            "publicly documented resume-parsing best practices. It does not "
-            "reproduce any specific ATS vendor's proprietary scoring algorithm "
-            "and is not a guarantee of how any real system will score this resume."
-        ),
-    }
-
-
 def check_resume_quality(resume_text: str, entities: dict, skills: list[dict]) -> dict:
     checks = []
 
@@ -243,7 +121,12 @@ def check_resume_quality(resume_text: str, entities: dict, skills: list[dict]) -
     }
 
 
-def check_compatibility_indicators(resume_text: str, jd_text: str, entities: dict, file_ext: str) -> dict:
+def check_compatibility_indicators(resume_text: str, entities: dict, file_ext: str) -> dict:
+    """
+    Boolean pass/fail indicators only. The score lives in the unified
+    similarity_service model, so this must never return a second number that
+    can disagree with it.
+    """
     indicators = []
 
     def add(label: str, ok: bool, note: str = ""):
@@ -267,6 +150,4 @@ def check_compatibility_indicators(resume_text: str, jd_text: str, entities: dic
     word_count = len(resume_text.split())
     add("Reasonable resume length", 150 <= word_count <= 1200, f"{word_count} words detected.")
 
-    ats = compute_ats_score(resume_text, jd_text, entities)
-
-    return {"indicators": indicators, "ats_score": ats}
+    return {"indicators": indicators}

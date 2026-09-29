@@ -14,6 +14,8 @@ class JobDescriptionResponse(BaseModel):
     all_skills: list[dict]
     education_requirement: str | None
     experience_requirement: str | None
+    experience_min_years: float | None = None
+    experience_max_years: float | None = None
     keywords: list[str]
 
 
@@ -35,6 +37,41 @@ class ScoreBreakdown(BaseModel):
     final_score: float
     used_semantic_model: bool
     weights: dict
+    raw_semantic_score: float | None = None
+    experience_score: float | None = None
+    parseability_score: float | None = None
+    categories: dict = {}
+    keyword_detail: dict = {}
+    parseability_detail: dict = {}
+
+
+class KnockoutGate(BaseModel):
+    label: str
+    requirement: str
+    requirement_met: bool
+    detail: str
+
+
+class KnockoutResult(BaseModel):
+    """Hard minimums the job description states, kept out of the numeric score.
+
+    A gate the job never states is not a failure, so `passed` is only False
+    for a real, stated requirement the resume does not meet.
+    """
+    gates: list[KnockoutGate] = []
+    failed: list[str] = []
+    passed: bool = True
+    evaluated: bool = False
+
+
+class ExperienceInfo(BaseModel):
+    years: float = 0.0
+    source: str = "none"
+    detail: str = ""
+    required: str | None = None
+    required_min_years: float | None = None
+    required_max_years: float | None = None
+    match_score: float | None = None
 
 
 class QualityCheck(BaseModel):
@@ -71,8 +108,16 @@ class AnalyzeResponse(BaseModel):
     recommendations: list[RecommendationItem]
     quality: dict
     compatibility: dict
+    knockouts: KnockoutResult = KnockoutResult()
     status: str
     created_at: datetime | None = None
+    required_skills: list[str] = []
+    preferred_skills: list[str] = []
+    matched_required: list[str] = []
+    missing_required: list[str] = []
+    matched_preferred: list[str] = []
+    missing_preferred: list[str] = []
+    experience: ExperienceInfo = ExperienceInfo()
 
     class Config:
         from_attributes = True

@@ -87,8 +87,13 @@ export default function AnalyzePage() {
               skillScore={result.scores.skill_score}
               keywordScore={result.scores.keyword_score}
               categories={result.scores.categories}
+              weights={result.scores.weights}
+              experience={result.experience}
             />
-            <ATSCompatibility compatibility={result.compatibility} />
+            <ATSCompatibility
+              compatibility={result.compatibility}
+              knockouts={result.knockouts}
+            />
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">

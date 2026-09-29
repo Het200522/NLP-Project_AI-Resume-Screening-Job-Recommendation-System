@@ -43,7 +43,8 @@ def test_analyze_full_flow_with_pdf(client, tmp_path):
     page.insert_text(
         (50, 50),
         "Jane Smith\njane.smith@example.com\n555-000-1111\n\nSkills\nPython, FastAPI, SQL, Docker\n\n"
-        "Experience\nBuilt REST APIs using Python and FastAPI.\n\nEducation\nB.Tech Computer Science",
+        "Experience\nBackend Engineer, Acme (2021-2023)\nBuilt REST APIs using Python and FastAPI.\n\n"
+        "Education\nB.Tech Computer Science",
         fontsize=11,
     )
     pdf_path = tmp_path / "resume.pdf"
@@ -62,7 +63,73 @@ def test_analyze_full_flow_with_pdf(client, tmp_path):
     assert data["candidate"]["email"] == "jane.smith@example.com"
     assert "Python" in data["matched_skills"]
     assert 0 <= data["scores"]["final_score"] <= 100
-    assert "ats_score" in data["compatibility"]
+    # One unified score: compatibility must not carry a second competing one.
+    assert "ats_score" not in data["compatibility"]
+    assert set(data["scores"]["categories"]) == {
+        "skill_match", "keyword_match", "semantic_match",
+        "experience_match", "parseability",
+    }
+    assert "knockouts" in data
+    assert set(data["knockouts"]) >= {"gates", "failed", "passed", "evaluated"}
+
+    # The new scoring fields must be present on the live response.
+    for key in ("raw_semantic_score", "experience_score", "categories", "weights",
+                "parseability_score", "keyword_detail", "parseability_detail"):
+        assert key in data["scores"], f"scores.{key} missing"
+    for key in ("matched_required", "missing_required", "matched_preferred", "missing_preferred"):
+        assert key in data, f"{key} missing"
+    assert set(data["experience"]) >= {
+        "years", "source", "detail", "required", "required_min_years", "match_score"
+    }
+    assert data["experience"]["years"] > 0
+
+
+def test_stored_analysis_reports_derived_fields_on_read_back(client, tmp_path):
+    """A saved analysis must round-trip with tiers and experience intact."""
+    fitz = pytest.importorskip("fitz")
+    doc = fitz.open()
+    page = doc.new_page()
+    page.insert_text(
+        (50, 50),
+        "Jane Smith\njane.smith@example.com\n\nSkills\nPython, SQL\n\n"
+        "Experience\nSoftware Engineer, Acme (2021-2023)\nBuilt REST APIs.",
+        fontsize=11,
+    )
+    pdf_path = tmp_path / "resume_roundtrip.pdf"
+    doc.save(str(pdf_path))
+
+    with open(pdf_path, "rb") as f:
+        created = client.post(
+            "/api/analyze",
+            files={"resume": (pdf_path.name, f, "application/pdf")},
+            data={"job_description": "Python developer with SQL and API experience."},
+        )
+    assert created.status_code == 200
+    analysis_id = created.json()["id"]
+
+    fetched = client.get(f"/api/analysis/{analysis_id}")
+    assert fetched.status_code == 200
+    data = fetched.json()
+
+    assert data["id"] == analysis_id
+    assert data["matched_skills"] == created.json()["matched_skills"]
+    assert data["missing_required"] == created.json()["missing_required"]
+    assert data["experience"]["years"] == created.json()["experience"]["years"]
+    # TF-IDF is recomputed, so it must not be aliased to the semantic score.
+    assert data["scores"]["tfidf_score"] != data["scores"]["semantic_score"] or not data[
+        "scores"
+    ]["used_semantic_model"]
+
+    # A saved analysis must show the same unified breakdown and gates the live
+    # endpoint returned, not an empty category map and a missing gate section.
+    live = created.json()
+    assert data["scores"]["categories"].keys() == live["scores"]["categories"].keys()
+    for key, value in live["scores"]["categories"].items():
+        if value is None:
+            continue
+        assert abs(data["scores"]["categories"][key] - value) < 0.5, key
+    assert data["knockouts"] == live["knockouts"]
+    assert "ats_score" not in data["compatibility"]
 
 
 def test_job_description_analyze_endpoint(client):

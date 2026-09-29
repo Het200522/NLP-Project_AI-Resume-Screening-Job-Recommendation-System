@@ -89,12 +89,8 @@ async def improve_resume(analysis_id: int, db: Session = Depends(get_db)):
     if skills_match:
         sections["skills"] = skills_match.group(1).strip()
 
-    # Get ATS score from compatibility data
-    try:
-        compatibility = json.loads(record.compatibility_json) if record.compatibility_json else {}
-        ats_score = compatibility.get("ats_score", {}).get("overall_score", 50.0)
-    except (json.JSONDecodeError, AttributeError):
-        ats_score = 50.0
+    # The unified ATS score is the only score; it is stored on the record.
+    ats_score = record.final_score
 
     try:
         result = generate_improved_resume(
@@ -142,11 +138,7 @@ async def get_improve_details(analysis_id: int, db: Session = Depends(get_db)):
     jd_info = parse_job_description(record.jd_text)
     jd_keywords = jd_info.get("keywords", [])
 
-    try:
-        compatibility = json.loads(record.compatibility_json) if record.compatibility_json else {}
-        ats_score = compatibility.get("ats_score", {}).get("overall_score", 50.0)
-    except (json.JSONDecodeError, AttributeError):
-        ats_score = 50.0
+    ats_score = record.final_score
 
     improvements = []
     if missing_skills_list:

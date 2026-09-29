@@ -132,6 +132,27 @@ def test_stored_analysis_reports_derived_fields_on_read_back(client, tmp_path):
     assert "ats_score" not in data["compatibility"]
 
 
+def test_scoring_config_endpoint_matches_live_weights(client):
+    """
+    Regression: the settings page hardcoded a 7-category weight table that had
+    already been deleted from the backend, so the UI described a model that no
+    longer existed. The endpoint must report exactly what the engine uses.
+    """
+    from app.config import ATS_WEIGHTS, PARSEABILITY_WEIGHTS
+
+    resp = client.get("/api/scoring/config")
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert data["weights"] == ATS_WEIGHTS
+    assert data["parseability_weights"] == PARSEABILITY_WEIGHTS
+    assert abs(sum(data["weights"].values()) - 1.0) < 1e-6
+    # The one-score contract: no legacy category may reappear.
+    assert "contact_info" not in data["weights"]
+    assert "achievements" not in data["weights"]
+    assert "knockouts_note" in data
+
+
 def test_job_description_analyze_endpoint(client):
     resp = client.post(
         "/api/job-description/analyze",

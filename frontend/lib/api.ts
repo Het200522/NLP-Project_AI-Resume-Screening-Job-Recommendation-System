@@ -188,6 +188,20 @@ export async function getRoleDescription(roleId: string): Promise<{ id: string; 
   return data;
 }
 
+export interface ScoringConfig {
+  weights: Record<string, number>;
+  parseability_weights: Record<string, number>;
+  semantic_floor: number;
+  semantic_ceiling: number;
+  formula: string;
+  knockouts_note: string;
+}
+
+export async function getScoringConfig(): Promise<ScoringConfig> {
+  const { data } = await api.get<ScoringConfig>("/api/scoring/config");
+  return data;
+}
+
 /** Extracts a user-friendly error message from an Axios error, never a raw stack trace. */
 export function getErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {

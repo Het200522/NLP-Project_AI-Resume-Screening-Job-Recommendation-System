@@ -30,7 +30,7 @@ Manually screening resumes against job requirements is slow, inconsistent, and h
 ## Features
 
 - Drag-and-drop resume upload (PDF/DOCX), with automatic Tesseract OCR fallback for scanned/image-only PDFs
-- Job description paste or upload (TXT/PDF/DOCX), plus 13 built-in role templates
+- Job description paste or upload (TXT/PDF/DOCX), plus 17 built-in role templates (13 mid/senior, 4 entry-level)
 - Resume summary generation (extractive, from actual resume content only)
 - Matched / missing / additional skill detection with normalization (e.g. "ML" → "Machine Learning") over a 226-skill taxonomy
 - **One unified ATS score** across five weighted categories, with every sub-score exposed (see [Scoring Model](#scoring-model))
@@ -300,6 +300,8 @@ A common symptom of either one being wrong is the "Select Role" dropdown showing
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/api/health` | Health check |
+| GET | `/api/scoring/config` | Live scoring weights (what the settings page renders) |
+| GET | `/api/job-description/roles` | List built-in role templates |
 | POST | `/api/resume/upload` | Upload and preview-extract a resume |
 | POST | `/api/job-description/analyze` | Parse a pasted job description |
 | POST | `/api/job-description/upload` | Upload a JD file (TXT/PDF/DOCX) |

@@ -406,6 +406,144 @@ ROLES: dict[str, dict] = {
             "Experience: 5-8 years of cloud architecture"
         ),
     },
+    "entry_ml_engineer": {
+        "id": "entry_ml_engineer",
+        "title": "Machine Learning Engineer (Entry Level)",
+        "category": "AI & ML",
+        "description": (
+            "Job Title: Machine Learning Engineer (Entry Level)\n\n"
+            "We are looking for an entry-level Machine Learning Engineer to join our team "
+            "and help build intelligent products. This is a junior role designed for "
+            "candidates with 0-2 years of experience or strong academic project work.\n\n"
+            "Responsibilities:\n"
+            "- Train, evaluate, and improve machine learning models\n"
+            "- Clean and prepare datasets for modeling\n"
+            "- Build data preprocessing and feature engineering steps\n"
+            "- Write clear notebooks and documentation of experiments\n"
+            "- Work with senior engineers to ship models into applications\n"
+            "- Contribute to model evaluation and monitoring\n\n"
+            "Required Skills:\n"
+            "- Proficiency in Python\n"
+            "- Hands-on experience with machine learning libraries (Scikit-learn, TensorFlow or PyTorch)\n"
+            "- Data manipulation with Pandas and NumPy\n"
+            "- SQL for data extraction and analysis\n"
+            "- Data cleaning and preprocessing techniques\n"
+            "- Data visualization with Matplotlib or Seaborn\n"
+            "- Experience presenting work in Jupyter notebooks\n\n"
+            "Preferred Skills:\n"
+            "- Knowledge of NLP or LLM techniques\n"
+            "- Experience with FastAPI or Flask for serving models\n"
+            "- Familiarity with Docker and Git\n"
+            "- Exposure to cloud platforms (AWS, GCP, or Azure)\n"
+            "- Side projects, internships, or open-source contributions\n\n"
+            "Education: Bachelor's degree in CS, AI, ML, or related field\n"
+            "Experience: 0-2 years (entry level; freshers and interns encouraged to apply)"
+        ),
+    },
+    "junior_data_scientist": {
+        "id": "junior_data_scientist",
+        "title": "Junior Data Scientist",
+        "category": "Data & Analytics",
+        "description": (
+            "Job Title: Junior Data Scientist\n\n"
+            "We are hiring a Junior Data Scientist to analyze our data, build predictive "
+            "models, and communicate insights that shape business decisions. This is a "
+            "junior role for candidates with 0-2 years of experience or equivalent "
+            "academic and project work.\n\n"
+            "Responsibilities:\n"
+            "- Collect, clean, and explore datasets\n"
+            "- Build and evaluate predictive models\n"
+            "- Create dashboards and visualizations for stakeholders\n"
+            "- Support experiments and measure their impact\n"
+            "- Document analysis so others can reproduce it\n"
+            "- Present findings clearly to non-technical teams\n\n"
+            "Required Skills:\n"
+            "- Proficiency in Python (Pandas, NumPy)\n"
+            "- Machine learning with Scikit-learn\n"
+            "- Strong SQL skills for data extraction\n"
+            "- Knowledge of statistics and hypothesis testing\n"
+            "- Regression and classification modeling\n"
+            "- Data visualization (Matplotlib, Seaborn)\n"
+            "- Experience working in Jupyter notebooks\n\n"
+            "Preferred Skills:\n"
+            "- Familiarity with Tableau or Power BI\n"
+            "- Experience with A/B testing\n"
+            "- Knowledge of Excel for quick analysis\n"
+            "- Exposure to deep learning (TensorFlow, PyTorch)\n"
+            "- Interest in NLP or LLM use cases\n\n"
+            "Education: Bachelor's degree in Statistics, Economics, CS, or related field\n"
+            "Experience: 0-2 years (entry level; freshers encouraged to apply)"
+        ),
+    },
+    "junior_software_engineer": {
+        "id": "junior_software_engineer",
+        "title": "Junior Software Engineer",
+        "category": "Engineering",
+        "description": (
+            "Job Title: Junior Software Engineer\n\n"
+            "We are looking for a Junior Software Engineer to grow with our team. "
+            "You will write code, fix bugs, and learn from senior engineers while "
+            "shipping real features to users. This is a junior role for candidates "
+            "with 0-2 years of experience or strong project work.\n\n"
+            "Responsibilities:\n"
+            "- Write and review code for new features and bug fixes\n"
+            "- Write unit and integration tests\n"
+            "- Debug and resolve issues reported by users\n"
+            "- Collaborate with teammates in an agile workflow\n"
+            "- Improve documentation and onboarding guides\n"
+            "- Learn and apply code review feedback\n\n"
+            "Required Skills:\n"
+            "- Proficiency in Python or Java\n"
+            "- Solid understanding of JavaScript basics\n"
+            "- SQL for working with relational databases\n"
+            "- Git version control\n"
+            "- Understanding of REST APIs\n"
+            "- Data structures and algorithms fundamentals\n"
+            "- Comfort with debugging and reading code you did not write\n\n"
+            "Preferred Skills:\n"
+            "- Experience with React or modern frontend frameworks\n"
+            "- Familiarity with Docker\n"
+            "- Exposure to CI/CD pipelines\n"
+            "- Knowledge of MongoDB or PostgreSQL\n"
+            "- Contributions to personal, academic, or open-source projects\n\n"
+            "Education: Bachelor's degree in CS or related field\n"
+            "Experience: 0-2 years (entry level; freshers encouraged to apply)"
+        ),
+    },
+    "junior_backend_engineer": {
+        "id": "junior_backend_engineer",
+        "title": "Junior Backend Engineer",
+        "category": "Engineering",
+        "description": (
+            "Job Title: Junior Backend Engineer\n\n"
+            "We are hiring a Junior Backend Engineer to build and maintain the APIs "
+            "behind our products. This is a junior role for candidates with 0-2 years "
+            "of experience, internship experience, or substantial project work.\n\n"
+            "Responsibilities:\n"
+            "- Build and maintain REST API endpoints\n"
+            "- Write database queries and design simple schemas\n"
+            "- Write tests for the services you change\n"
+            "- Investigate and fix bugs reported by the team\n"
+            "- Document your services and endpoints\n"
+            "- Participate in code reviews with senior engineers\n\n"
+            "Required Skills:\n"
+            "- Proficiency in Python\n"
+            "- Experience building APIs with FastAPI or Flask\n"
+            "- SQL and relational database skills (MySQL or PostgreSQL)\n"
+            "- Understanding of REST API design\n"
+            "- Git version control\n"
+            "- Data structures and algorithms fundamentals\n"
+            "- Interest in writing automated tests\n\n"
+            "Preferred Skills:\n"
+            "- Familiarity with Docker and containers\n"
+            "- Knowledge of Redis or MongoDB\n"
+            "- Exposure to Linux and Linux commands\n"
+            "- Experience with GitHub Actions or other CI tools\n"
+            "- Personal projects deployed to a public server\n\n"
+            "Education: Bachelor's degree in CS or related field\n"
+            "Experience: 0-2 years (entry level; freshers and interns encouraged to apply)"
+        ),
+    },
 }
 
 

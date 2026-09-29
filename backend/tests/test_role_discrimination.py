@@ -111,3 +111,67 @@ def test_every_role_produces_usable_skill_requirements():
             f"{role_id} extracted only {len(info['required_skills'])} required skills"
         )
         assert info["all_skills"], f"{role_id} produced no skills at all"
+
+
+ENTRY_LEVEL_ROLES = [
+    "entry_ml_engineer", "junior_data_scientist",
+    "junior_software_engineer", "junior_backend_engineer",
+]
+
+
+def test_entry_level_roles_exist_and_are_actually_entry_level():
+    """
+    Every original template required 2-8 years, so a fresher failed the
+    experience gate on all 13 and lost the same 15 points everywhere. The
+    score could not tell a fresher-appropriate role from a senior one.
+    """
+    for role_id in ENTRY_LEVEL_ROLES:
+        assert role_id in ROLES, f"{role_id} missing from role templates"
+        req = parse_experience_requirement(ROLES[role_id]["description"])
+        assert req is not None, f"{role_id} states no experience requirement"
+        # min 0.0 means the gate does not fire and 0 years scores full marks.
+        assert req.min_years == 0.0, (
+            f"{role_id} requires {req.min_years}+ years, which is not entry level"
+        )
+        assert experience_match_score(0.0, req) == 100.0
+
+
+def test_fresher_passes_entry_level_gates_and_fails_senior_gates():
+    from app.services.knockout import evaluate_knockouts
+
+    fresher = AIML_STUDENT
+
+    for role_id in ENTRY_LEVEL_ROLES:
+        result = evaluate_knockouts(fresher, ROLES[role_id]["description"])
+        exp_gates = [g for g in result["gates"] if g["label"] == "Minimum experience"]
+        assert not exp_gates, (
+            f"{role_id} raised an experience gate despite being entry level"
+        )
+
+    # The same resume must still hit the hard requirement on a senior template.
+    senior = evaluate_knockouts(fresher, ROLES["backend_engineer"]["description"])
+    assert senior["passed"] is False
+    assert "Minimum experience" in senior["failed"]
+
+
+def test_student_scores_higher_on_entry_level_roles_than_their_senior_equivalents():
+    """
+    Same resume, same discipline: an entry-level posting must score clearly
+    above the 3-6 year posting, because the experience category and the
+    seniority-flavoured skill sets both favour it.
+    """
+    pairs = [
+        ("entry_ml_engineer", "ml_engineer"),
+        ("junior_data_scientist", "data_scientist"),
+        ("junior_backend_engineer", "backend_engineer"),
+    ]
+    for junior_id, senior_id in pairs:
+        junior = _score(AIML_STUDENT, junior_id)["final_score"]
+        senior = _score(AIML_STUDENT, senior_id)["final_score"]
+        assert junior > senior, (
+            f"{junior_id} ({junior}) should out-score {senior_id} ({senior})"
+        )
+        assert junior - senior >= 5, (
+            f"{junior_id} only {junior - senior:.1f} above {senior_id}; "
+            "the entry-level signal is too weak to be meaningful"
+        )

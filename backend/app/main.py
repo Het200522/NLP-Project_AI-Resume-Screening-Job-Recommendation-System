@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import CORS_ORIGINS
 from app.database import init_db
-from app.api import resume, job_description, analysis, candidates, reports
+from app.api import resume, job_description, analysis, candidates, reports, scoring
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -67,3 +67,4 @@ app.include_router(job_description.router)
 app.include_router(analysis.router)
 app.include_router(candidates.router)
 app.include_router(reports.router)
+app.include_router(scoring.router)

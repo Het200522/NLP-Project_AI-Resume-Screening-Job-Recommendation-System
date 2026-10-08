@@ -2,8 +2,10 @@
 report_generator.py
 Generates a professional PDF analysis report using ReportLab.
 """
+import re
 from datetime import datetime
 from pathlib import Path
+from xml.sax.saxutils import escape as xml_escape
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -14,6 +16,106 @@ from reportlab.platypus import (
 )
 
 from app.config import OUTPUT_DIR
+
+# Lines starting with a bullet glyph (a glyph alone on the line counts too).
+_BULLET_RE = re.compile(r"^(?:[\u2022\u25cf\u25aa\u25e6\u2023\u00b7*]\s*|[-\u2013]\s+)")
+# A tech-stack line such as "Python | NLP | RAG".
+_STACK_RE = re.compile(r"(?:[^|]*\|){2,}")
+_ENDS_SENTENCE = (".", "!", "?", ":", "\u2026")
+
+
+def _split_units(text: str) -> list[tuple[str, str]]:
+    """
+    Splits raw extracted section text into ("p", line) paragraph units and
+    ("b", line) bullet-item units, re-joining lines that were only wrapped
+    by the original layout so bullets become real list items instead of
+    running together in one paragraph.
+    """
+    units: list[tuple[str, str]] = []
+
+    def _joins_prev(kind: str, content: str) -> bool:
+        if not units:
+            return False
+        prev_kind, prev_content = units[-1]
+        if prev_kind != kind:
+            return False
+        if prev_content and prev_content.endswith(_ENDS_SENTENCE):
+            return False
+        # Short previous line = a title/header, not a wrapped line.
+        if prev_content and len(prev_content.split()) < 8:
+            return False
+        # A "Python | NLP | RAG" line stays its own paragraph.
+        if kind == "p" and _STACK_RE.match(content):
+            return False
+        return True
+
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        bullet = _BULLET_RE.match(line)
+        if bullet:
+            # A bullet always starts a new list item; an empty placeholder is
+            # filled in by the next line when the glyph sits alone.
+            units.append(("b", line[bullet.end():].strip()))
+        elif _is_heading_text(line):
+            units.append(("p", line))
+        elif _joins_prev(units[-1][0] if units else "p", line):
+            kind = units[-1][0]
+            units[-1] = (kind, (units[-1][1] + " " + line).strip())
+        else:
+            units.append(("p", line))
+
+    return [(kind, content) for kind, content in units if content]
+
+
+def _is_heading_text(content: str) -> bool:
+    """Short line with an em/en dash, e.g. a project or job title."""
+    return (
+        ("\u2014" in content or "\u2013" in content)
+        and len(content.split()) <= 12
+        and not content.endswith((".", "!", "?"))
+    )
+
+
+def _section_flowables(text: str, style: ParagraphStyle) -> list:
+    """
+    Renders extracted section text (Experience, Projects, ...) as proper
+    PDF flowables: bullet lines become a bulleted list, everything else
+    becomes paragraphs. All text is XML-escaped so characters like & or <
+    cannot break the report.
+    """
+    flowables = []
+    bullet_contents: list[str] = []
+
+    def _flush_bullets():
+        if not bullet_contents:
+            return
+        items = [
+            ListItem(Paragraph(xml_escape(content), style))
+            for content in bullet_contents
+            if content
+        ]
+        if items:
+            flowables.append(ListFlowable(
+                items, bulletType="bullet", start="\u2022",
+                leftIndent=16, bulletFontSize=9,
+            ))
+        bullet_contents.clear()
+
+    for kind, content in _split_units(text):
+        if kind == "b":
+            bullet_contents.append(content)
+            continue
+        _flush_bullets()
+        if _is_heading_text(content):
+            content = f"<b>{xml_escape(content)}</b>"
+        else:
+            content = xml_escape(content)
+        flowables.append(Paragraph(content, style))
+
+    _flush_bullets()
+    return flowables or [Paragraph("Not detected", style)]
 
 
 def generate_report(analysis: dict) -> str:
@@ -133,14 +235,14 @@ def generate_report(analysis: dict) -> str:
 
     # Resume Summary
     story.append(Paragraph("Resume Summary", h2))
-    story.append(Paragraph(analysis.get("summary") or "Not detected", body))
+    story.append(Paragraph(xml_escape(analysis.get("summary") or "Not detected"), body))
 
     # Experience & Projects (real extracted content, not just a boolean flag)
     story.append(Paragraph("Experience", h2))
-    story.append(Paragraph(analysis.get("experience_text") or "Not detected", body))
+    story.extend(_section_flowables(analysis.get("experience_text") or "Not detected", body))
 
     story.append(Paragraph("Projects", h2))
-    story.append(Paragraph(analysis.get("projects_text") or "Not detected", body))
+    story.extend(_section_flowables(analysis.get("projects_text") or "Not detected", body))
 
     # Resume Quality Checks
     story.append(Paragraph("Resume Quality Checks", h2))
